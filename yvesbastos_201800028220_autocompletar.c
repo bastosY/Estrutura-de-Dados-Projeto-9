@@ -16,11 +16,14 @@ typedef struct node{
 node* initNode(char key){
 
     node* element = (node*)malloc(sizeof(node));
+
     element->order = -1;
+
     element->bool = 0;
+
     element->value = key;
 
-    element->children = (node**)malloc(26*sizeof(node*));
+    element->children = (node**)malloc(25*sizeof(node*));
     for(int i = 0 ; i < 26 ; i++){
 
        element->children[i] = (node*)malloc(sizeof(node));
@@ -49,7 +52,6 @@ node* insert(node* root, char key[21], uint32_t digit, uint32_t order){
 
         root->order = order; 
         strcpy(root->word, key);
-
     }
     else{
 
@@ -67,29 +69,21 @@ void down(node* root, int limit, int atual, FILE** output){
             
             if(root->children[i]->order != -1 && root->children[i]->bool == 0){
                 if(vir == 1){
-
                     fprintf(*output, ",");   
                     fprintf(*output, "%s", root->children[i]->word);
-
                 }
                 else{
-
-                    fprintf(*output, "%s", root->children[i]->word);
+                    fprintf(*output,"%s", root->children[i]->word);
                     vir = 1;
-
                 }
                 root->children[i]->bool = 1;
                 
             }
             if(atual < limit - 1){
-
                 down(root->children[i], limit, atual+1, output);
-
             }
             else{
-
                 return;
-
             }
         }
     }
@@ -99,53 +93,39 @@ void down(node* root, int limit, int atual, FILE** output){
 void search(node* root, char key[21], FILE** output){
 
     node* aux = root;
-    node* value = initNode('X');
-
-    int z = 0, h;
+   
+    int z = 0;
     fprintf(*output,"%s:", key);
-
-    for(h = 1 ; h <= strlen(key) ; h++){   
+    for(int h = 1 ; h <= strlen(key) ; h++){   
         for(int i = 0; i < 26 ; i++){
             if(aux->children[i] != NULL){
                 if(aux->children[i]->value == key[z]){
-
-                    value->children[i] = aux->children[i];
-                    value->word[strlen(value->word)] = aux->children[i]->value;
+                   
                     aux = aux->children[i];
-                
+                    down(aux, h*2, h, output);
                     z++;
                     break;
 
                 }
             }
-        }      
-    }
-
-    if(strlen(value->word) != 0){
-
-        down(value->children[indice(value->word, strlen(value->word))], h*2, h, output);
-
-        if(strlen(value->word) == z){
-
-            down(value->children[indice(value->word, 1)], h*2, h, output);
-
+        }   
+        if(z == 0){
+            fprintf(*output,"-");
+            break;
         }
+       
     }
-    else{
-
-        fprintf(*output,"-");
-
-    }
-
     vir = 0;
     fprintf(*output,"\n");
 }
+
 
 int main(int argc, char const *argv[])
 {
 
     FILE* input = fopen(argv[1], "r");
 	FILE* output = fopen(argv[2], "w");
+
 
     node *root = initNode('X');
 
