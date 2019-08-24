@@ -15,21 +15,19 @@ typedef struct node{
 
 node* initNode(char key){
 
-    node* element = (node*)malloc(sizeof(node));
+    node* element = malloc(sizeof(node));
 
     element->order = -1;
-
     element->bool = 0;
-
     element->value = key;
-
-    element->children = (node**)malloc(25*sizeof(node*));
+    element->children = (node**)malloc(26*sizeof(node*));
+    
     for(int i = 0 ; i < 26 ; i++){
 
        element->children[i] = (node*)malloc(sizeof(node));
        element->children[i] = NULL;
     }
-
+    
     return element;
 
 }
@@ -61,71 +59,89 @@ node* insert(node* root, char key[21], uint32_t digit, uint32_t order){
 
     return root;
 }
+
 int vir = 0;
 void down(node* root, int limit, int atual, FILE** output){
 
     for(int i = 0; i < 26; i++){
+
         if(root->children[i] != NULL){
-            
+
             if(root->children[i]->order != -1 && root->children[i]->bool == 0){
+                
                 if(vir == 1){
+
                     fprintf(*output, ",");   
                     fprintf(*output, "%s", root->children[i]->word);
+
                 }
                 else{
+
                     fprintf(*output,"%s", root->children[i]->word);
                     vir = 1;
+
                 }
+
                 root->children[i]->bool = 1;
                 
             }
             if(atual < limit - 1){
+
                 down(root->children[i], limit, atual+1, output);
+               
             }
             else{
+
                 return;
+
             }
         }
     }
 }
 
+void clean(node* root){
+    for(int i = 0; i < 26; i++){
+        if(root->children[i] != NULL){
+            if(root->children[i]->bool == 1){
+                root->children[i]->bool = 0;
+            }
+        }
+    }
+}
 
 void search(node* root, char key[21], FILE** output){
 
-    node* aux = root;
-   
+    node* aux = root;   
+    
     int z = 0;
     fprintf(*output,"%s:", key);
     for(int h = 1 ; h <= strlen(key) ; h++){   
         for(int i = 0; i < 26 ; i++){
             if(aux->children[i] != NULL){
                 if(aux->children[i]->value == key[z]){
-                   
+               
                     aux = aux->children[i];
                     down(aux, h*2, h, output);
+                    clean(aux);
                     z++;
                     break;
-
                 }
             }
         }   
         if(z == 0){
             fprintf(*output,"-");
             break;
-        }
-       
+        }  
     }
     vir = 0;
     fprintf(*output,"\n");
 }
-
 
 int main(int argc, char const *argv[])
 {
 
     FILE* input = fopen(argv[1], "r");
 	FILE* output = fopen(argv[2], "w");
-
 
     node *root = initNode('X');
 
@@ -146,7 +162,7 @@ int main(int argc, char const *argv[])
 
         fscanf(input, "%s", key);
         search(root, key, &output);
-        
+   
     }
     
     fclose(input);
