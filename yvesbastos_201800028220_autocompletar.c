@@ -67,9 +67,9 @@ void down(node* root, int limit, int atual, FILE** output){
 
         if(root->children[i] != NULL){
 
-            if(root->children[i]->order != -1 && root->children[i]->bool == 0){
-                
+            if(root->children[i]->order != -1 && root->children[i]->bool == 0 && atual < limit){
                 if(vir == 1){
+
 
                     fprintf(*output, ",");   
                     fprintf(*output, "%s", root->children[i]->word);
@@ -85,11 +85,12 @@ void down(node* root, int limit, int atual, FILE** output){
                 root->children[i]->bool = 1;
                 
             }
-            if(atual < limit - 1){
+            if(atual < limit ){
 
                 down(root->children[i], limit, atual+1, output);
                
             }
+            
             else{
 
                 return;
